@@ -93,6 +93,15 @@ frontend/src/
 - **Documentation**: Can be committed directly to main (markdown files only)
 - **Code**: Must go through develop → feature branch → PR → develop → main workflow
 
+### GitHub Actions Setup
+- **CI Pipeline**: Runs on PR to main and push to develop
+- **Critical Path Tests**: Focused testing for invoice generation and WhatsApp API
+- **Required Checks**: backend-tests, frontend-tests, integration-tests
+- **Branch Protection** (requires GitHub Pro for private repos):
+  - Require PR reviews before merging to main
+  - Require status checks to pass
+  - Dismiss stale reviews when new commits are pushed
+
 ### Terminal Usage
 Claude is authorized to use standard development commands:
 - `bash`, `grep`, `find`, `sed`, `awk`
