@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.core.config import settings
 from app.routers.v1 import health
 
@@ -21,10 +22,11 @@ app.add_middleware(
 
 app.include_router(health.router, prefix="/api/v1")
 
+
 @app.get("/")
 async def root():
     return {
         "message": "StudioHub API - Design Studio Orchestration Platform",
         "version": "1.0.0",
-        "environment": settings.ENVIRONMENT
+        "environment": settings.ENVIRONMENT,
     }

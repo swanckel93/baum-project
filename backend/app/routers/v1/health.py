@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException
 from datetime import datetime
+
 import redis
-from sqlalchemy import text
+from fastapi import APIRouter, HTTPException
+
 from app.core.config import settings
 
 router = APIRouter(tags=["health"])
+
 
 @router.get("/health")
 async def health_check():
@@ -20,10 +22,10 @@ async def health_check():
         "services": {
             "database": "unknown",
             "redis": "unknown",
-            "application": "healthy"
-        }
+            "application": "healthy",
+        },
     }
-    
+
     # Check Redis connection
     try:
         redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
@@ -33,14 +35,15 @@ async def health_check():
     except Exception as e:
         status["services"]["redis"] = f"unhealthy: {str(e)}"
         status["status"] = "degraded"
-    
+
     # For now, assume database is healthy (we'll implement proper check when DB is set up)
     status["services"]["database"] = "not_configured"
-    
+
     if status["status"] != "healthy":
         raise HTTPException(status_code=503, detail=status)
-    
+
     return status
+
 
 @router.get("/health/simple")
 async def simple_health_check():
