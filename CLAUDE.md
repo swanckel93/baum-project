@@ -6,7 +6,7 @@
 A WhatsApp-integrated project management system that automates craftsman communication, quote collection, and invoice generation for architectural design projects.
 
 ## Architecture
-- **Backend**: FastAPI + PostgreSQL + SQLAlchemy + Celery
+- **Backend**: FastAPI + PostgreSQL + SQLAlchemy + Celery (Python 3.13)
 - **Frontend**: React + TypeScript + Tailwind CSS
 - **Integrations**: WhatsApp Business API, AWS S3
 - **Queue**: Redis + Celery for async processing
