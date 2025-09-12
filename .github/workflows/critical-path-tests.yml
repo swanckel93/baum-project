@@ -1,0 +1,106 @@
+name: Critical Path Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/app/services/invoice.py'
+      - 'backend/app/services/pdf.py'
+      - 'backend/app/services/whatsapp.py'
+      - 'backend/app/workers/invoice.py'
+      - 'backend/app/workers/whatsapp.py'
+      - 'backend/tests/services/test_invoice.py'
+      - 'backend/tests/services/test_whatsapp.py'
+
+jobs:
+  critical-path-tests:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: studiohub_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: "latest"
+    
+    - name: Install dependencies
+      working-directory: ./backend
+      run: uv sync --dev
+    
+    - name: Test Invoice PDF Generation
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/studiohub_test
+        TESTING: true
+      run: |
+        uv run pytest tests/services/test_invoice.py::test_invoice_pdf_generation -v
+        uv run pytest tests/services/test_invoice.py::test_margin_calculations -v
+    
+    - name: Test WhatsApp API Integration
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/studiohub_test
+        REDIS_URL: redis://localhost:6379
+        TESTING: true
+      run: |
+        uv run pytest tests/services/test_whatsapp.py::test_send_document -v
+        uv run pytest tests/services/test_whatsapp.py::test_delivery_status -v
+    
+    - name: Test Quote Parsing Accuracy
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/studiohub_test
+        TESTING: true
+      run: |
+        uv run pytest tests/services/test_parsing.py::test_spanish_price_parsing -v
+        uv run pytest tests/services/test_parsing.py::test_confidence_scoring -v
+    
+    - name: Performance Test - Document Upload
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/studiohub_test
+        TESTING: true
+      run: |
+        uv run pytest tests/performance/test_document_upload.py -v
+
+    - name: Generate Critical Path Report
+      working-directory: ./backend
+      run: |
+        uv run pytest tests/services/test_invoice.py tests/services/test_whatsapp.py tests/services/test_parsing.py --cov=app/services --cov-report=html --cov-report=term-missing
+    
+    - name: Upload Critical Path Coverage
+      uses: actions/upload-artifact@v3
+      with:
+        name: critical-path-coverage
+        path: backend/htmlcov/
