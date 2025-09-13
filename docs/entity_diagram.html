@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudioHub - Entity Relationship Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .diagram-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .notes {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+        }
+        .notes h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .notes ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .notes li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .hierarchy {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>StudioHub - Entity Relationship Diagram</h1>
+        <p class="subtitle">Design Studio Orchestration Platform for Estudio Baum Arquitectos</p>
+        
+        <div class="hierarchy">
+            Core Hierarchy: Project → Campaign → Item → Quote
+        </div>
+
+        <div class="diagram-container">
+            <div class="mermaid">
+erDiagram
+    User {
+        int id PK
+        string email UK
+        string hashed_password
+        string full_name
+        string phone
+        boolean is_active
+        boolean is_admin
+        datetime created_at
+        datetime updated_at
+    }
+    
+    Client {
+        int id PK
+        string name
+        string email
+        string phone
+        string whatsapp
+        text address
+        string company
+        text notes
+        datetime created_at
+        datetime updated_at
+    }
+    
+    Craftsman {
+        int id PK
+        string name
+        string email
+        string phone
+        string whatsapp
+        string specialties
+        decimal hourly_rate
+        text notes
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
+    
+    Project {
+        int id PK
+        string name
+        text description
+        string status
+        decimal budget
+        date start_date
+        date end_date
+        int user_id FK
+        int client_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    Campaign {
+        int id PK
+        string name
+        text description
+        string status
+        int project_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    Item {
+        int id PK
+        string name
+        text description
+        int quantity
+        string unit
+        decimal estimated_cost
+        int campaign_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    Quote {
+        int id PK
+        decimal price
+        string currency
+        text description
+        string status
+        decimal margin_percentage
+        date valid_until
+        text whatsapp_message
+        int item_id FK
+        int craftsman_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    Task {
+        int id PK
+        string title
+        text description
+        string status
+        string priority
+        date due_date
+        int project_id FK
+        int assigned_user_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    %% Relationships
+    User ||--o{ Project : "manages"
+    Client ||--o{ Project : "owns"
+    Project ||--o{ Campaign : "contains"
+    Project ||--o{ Task : "has"
+    Campaign ||--o{ Item : "includes"
+    Item ||--o{ Quote : "receives"
+    Craftsman ||--o{ Quote : "provides"
+    User ||--o{ Task : "assigned_to"
+            </div>
+        </div>
+
+        <div class="notes">
+            <h3>🔗 Key Relationships</h3>
+            <ul>
+                <li><strong>User</strong> manages multiple <strong>Projects</strong> (1:N)</li>
+                <li><strong>Client</strong> owns multiple <strong>Projects</strong> (1:N)</li>
+                <li><strong>Project</strong> contains multiple <strong>Campaigns</strong> (1:N)</li>
+                <li><strong>Project</strong> has multiple <strong>Tasks</strong> (1:N)</li>
+                <li><strong>Campaign</strong> includes multiple <strong>Items</strong> (1:N)</li>
+                <li><strong>Item</strong> receives multiple <strong>Quotes</strong> from different craftsmen (1:N)</li>
+                <li><strong>Craftsman</strong> provides multiple <strong>Quotes</strong> (1:N)</li>
+                <li><strong>User</strong> can be assigned to multiple <strong>Tasks</strong> (1:N)</li>
+            </ul>
+        </div>
+
+        <div class="notes">
+            <h3>💼 Business Logic Considerations</h3>
+            <ul>
+                <li><strong>Quote comparison</strong>: Multiple craftsmen can quote on the same item</li>
+                <li><strong>Margin calculations</strong>: Quotes include margin percentages for pricing</li>
+                <li><strong>WhatsApp integration</strong>: Quotes store original WhatsApp messages for parsing</li>
+                <li><strong>Status tracking</strong>: Projects, campaigns, items, quotes, and tasks all have status fields</li>
+                <li><strong>Financial tracking</strong>: Budget at project level, costs at item level, prices at quote level</li>
+                <li><strong>Multi-language support</strong>: Spanish/Catalan content for local architects</li>
+                <li><strong>Document management</strong>: CAD files and project assets stored in AWS S3</li>
+            </ul>
+        </div>
+
+        <div class="notes">
+            <h3>🔧 Technical Implementation Notes</h3>
+            <ul>
+                <li><strong>Database</strong>: PostgreSQL with SQLAlchemy ORM</li>
+                <li><strong>Foreign Keys</strong>: Proper cascading relationships</li>
+                <li><strong>Indexes</strong>: On frequently queried fields (email, project_id, status)</li>
+                <li><strong>Timestamps</strong>: Automatic created_at and updated_at for all entities</li>
+                <li><strong>Validation</strong>: Pydantic schemas for API validation</li>
+                <li><strong>Status Enums</strong>: Controlled vocabularies for status fields</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        });
+    </script>
+</body>
+</html>
