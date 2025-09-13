@@ -56,7 +56,7 @@ jobs:
     
     - name: Install dependencies
       working-directory: ./backend
-      run: uv sync --extra dev --extra test
+      run: uv sync --extra test
     
     - name: Test Invoice PDF Generation
       working-directory: ./backend
