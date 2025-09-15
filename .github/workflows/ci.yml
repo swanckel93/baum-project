@@ -44,7 +44,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv sync --dev
+        uv sync --dev --extra test
 
     - name: Wait for PostgreSQL
       run: |
