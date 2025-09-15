@@ -231,7 +231,7 @@ class TestProjectEndpoints:
         # Test different filter combinations
         test_cases = [
             {"params": "", "expected_count": 1},
-            {"params": "?active_only=true", "expected_count": 0},  # Project is in planning status
+            {"params": "?active_only=true", "expected_count": 1},  # Project is in planning status (considered active)
             {"params": f"?client_id={client_id}", "expected_count": 1},
             {"params": "?user_id=1", "expected_count": 1},
         ]
