@@ -1,55 +1,25 @@
 """Test configuration and fixtures"""
 
 import pytest
+import os
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.core.database import get_db
-from app.models.base import Base
-
-
-# Create test database engine
-SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///./test.db"
-
-engine = create_engine(
-    SQLALCHEMY_TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def get_test_db():
-    """Get test database session"""
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
+from app.core.test_database import test_db_manager
 
 
 @pytest.fixture(scope="function")
 def db_session():
-    """Create a fresh database for each test"""
-    # Create all tables
-    Base.metadata.create_all(bind=engine)
+    """Create a fresh PostgreSQL database for each test"""
+    # Get the test node name for unique database naming
+    test_name = os.environ.get('PYTEST_CURRENT_TEST', 'unknown_test')
     
-    # Get a database session
-    db = TestingSessionLocal()
-    
-    try:
-        yield db
-    finally:
-        db.close()
-        # Drop all tables after test
-        Base.metadata.drop_all(bind=engine)
+    with test_db_manager.get_test_db_session(test_name) as session:
+        yield session
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="function") 
 def client(db_session):
     """Create a test client with database dependency override"""
     def get_test_db_override():
@@ -64,6 +34,17 @@ def client(db_session):
         yield test_client
     
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def verify_test_db_connection():
+    """Verify PostgreSQL test database connection before running tests"""
+    if not test_db_manager.verify_connection():
+        pytest.exit(
+            "Cannot connect to PostgreSQL test database. "
+            "Please ensure Docker container is running:\n"
+            "docker-compose -f docker-compose.test.yml up -d"
+        )
 
 
 @pytest.fixture

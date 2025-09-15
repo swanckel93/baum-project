@@ -22,14 +22,14 @@ class TestMigrations:
         alembic_cfg = Config(str(backend_dir / "alembic.ini"))
         
         # Use the test database URL from settings
-        alembic_cfg.set_main_option("sqlalchemy.url", settings.DATABASE_URL_TEST)
+        alembic_cfg.set_main_option("sqlalchemy.url", settings.TEST_DATABASE_URL)
         
         return alembic_cfg
     
     @pytest.fixture
     def test_engine(self):
         """Create test database engine."""
-        engine = create_engine(settings.DATABASE_URL_TEST)
+        engine = create_engine(settings.TEST_DATABASE_URL)
         return engine
     
     def test_migration_script_exists(self, alembic_config):

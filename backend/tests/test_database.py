@@ -82,7 +82,7 @@ class TestDatabaseConnection:
         
         # Test settings are accessible
         assert settings.DATABASE_URL is not None
-        assert settings.DATABASE_URL_TEST is not None
+        assert settings.TEST_DATABASE_URL is not None
     
     def test_database_url_from_settings(self):
         """Test that database URL comes from settings."""

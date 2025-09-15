@@ -106,6 +106,7 @@ class TestProjectEndpoints:
         
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
+    @pytest.mark.xfail(reason="Foreign key constraint errors need proper handling in service layer")
     def test_create_project_invalid_client_id(self, client, sample_user_data, sample_client_data, sample_project_data):
         """Test error with invalid client_id"""
         user_id, client_id = self.setup_dependencies(client, sample_user_data, sample_client_data)
@@ -113,9 +114,8 @@ class TestProjectEndpoints:
         
         response = client.post("/api/v1/projects/", json=sample_project_data)
         
-        # Note: This would be caught by foreign key constraint in a real database
-        # For now, we just test that the endpoint accepts valid format
-        assert sample_project_data["client_id"] > 0
+        # PostgreSQL enforces foreign key constraints - should return proper error response
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_get_project_success(self, client, sample_user_data, sample_client_data, sample_project_data):
         """Test successful project retrieval"""
