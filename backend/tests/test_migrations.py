@@ -70,14 +70,14 @@ class TestMigrations:
 
         # Check that it contains expected table creations
         expected_tables = [
-            "create_table('users'",
-            "create_table('clients'",
-            "create_table('craftsmen'",
-            "create_table('projects'",
-            "create_table('campaigns'",
-            "create_table('items'",
-            "create_table('quotes'",
-            "create_table('tasks'",
+            'create_table(\n        "users"',
+            'create_table(\n        "clients"',
+            'create_table(\n        "craftsmen"',
+            'create_table(\n        "projects"',
+            'create_table(\n        "campaigns"',
+            'create_table(\n        "items"',
+            'create_table(\n        "quotes"',
+            'create_table(\n        "tasks"',
         ]
 
         for table_creation in expected_tables:
