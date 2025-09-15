@@ -794,6 +794,11 @@ test = [
     { name = "pytest-cov" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.16.5" },
@@ -816,6 +821,9 @@ requires-dist = [
     { name = "uvicorn", specifier = ">=0.35.0" },
 ]
 provides-extras = ["dev", "test"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.13.0" }]
 
 [[package]]
 name = "typing-extensions"

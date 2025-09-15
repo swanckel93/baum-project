@@ -1,36 +1,45 @@
-import pytest
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
+
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.models.base import BaseModel
 from app.models import (
-    User, Client, Craftsman, Project, Campaign, Item, Quote, Task,
-    ProjectStatus, CampaignStatus, QuoteStatus, Currency, 
-    TaskStatus, TaskPriority, Unit
+    Campaign,
+    CampaignStatus,
+    Client,
+    Craftsman,
+    Currency,
+    Item,
+    Project,
+    ProjectStatus,
+    Quote,
+    QuoteStatus,
+    Task,
+    TaskPriority,
+    TaskStatus,
+    Unit,
+    User,
 )
+from app.models.base import BaseModel
 
 
 @pytest.fixture
 def db_session():
     """Create an in-memory SQLite database for testing."""
-    engine = create_engine(
-        "sqlite:///:memory:",
-        poolclass=StaticPool,
-        echo=False
-    )
-    
+    engine = create_engine("sqlite:///:memory:", poolclass=StaticPool, echo=False)
+
     # Create all tables
     BaseModel.metadata.create_all(engine)
-    
+
     # Create session
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    
+    test_session = sessionmaker(bind=engine)
+    session = test_session()
+
     yield session
-    
+
     session.close()
 
 
@@ -43,7 +52,7 @@ def sample_user(db_session):
         full_name="Test User",
         phone="+34123456789",
         is_active=True,
-        is_admin=False
+        is_admin=False,
     )
     db_session.add(user)
     db_session.commit()
@@ -60,7 +69,7 @@ def sample_client(db_session):
         phone="+34987654321",
         whatsapp="+34987654321",
         address="123 Test Street, Barcelona",
-        company="Test Company SL"
+        company="Test Company SL",
     )
     db_session.add(client)
     db_session.commit()
@@ -78,7 +87,7 @@ def sample_craftsman(db_session):
         whatsapp="+34555666777",
         specialties="carpentry,plumbing",
         hourly_rate=Decimal("25.50"),
-        is_active=True
+        is_active=True,
     )
     db_session.add(craftsman)
     db_session.commit()
@@ -88,7 +97,7 @@ def sample_craftsman(db_session):
 
 class TestUserModel:
     """Test User model functionality."""
-    
+
     def test_create_user(self, db_session):
         """Test creating a user."""
         user = User(
@@ -96,18 +105,18 @@ class TestUserModel:
             hashed_password="hashed_password",
             full_name="New User",
             is_active=True,
-            is_admin=False
+            is_admin=False,
         )
         db_session.add(user)
         db_session.commit()
-        
+
         assert user.id is not None
         assert user.email == "newuser@example.com"
         assert user.full_name == "New User"
         assert user.is_active is True
         assert user.is_admin is False
         assert user.created_at is not None
-        
+
     def test_user_repr(self, sample_user):
         """Test user string representation."""
         expected = f"<User(id={sample_user.id}, email='test@example.com', full_name='Test User')>"
@@ -116,23 +125,21 @@ class TestUserModel:
 
 class TestClientModel:
     """Test Client model functionality."""
-    
+
     def test_create_client(self, db_session):
         """Test creating a client."""
         client = Client(
-            name="New Client",
-            email="newclient@example.com",
-            company="New Company"
+            name="New Client", email="newclient@example.com", company="New Company"
         )
         db_session.add(client)
         db_session.commit()
-        
+
         assert client.id is not None
         assert client.name == "New Client"
         assert client.email == "newclient@example.com"
         assert client.company == "New Company"
         assert client.created_at is not None
-        
+
     def test_client_repr(self, sample_client):
         """Test client string representation."""
         expected = f"<Client(id={sample_client.id}, name='Test Client', email='client@example.com')>"
@@ -141,23 +148,21 @@ class TestClientModel:
 
 class TestCraftsmanModel:
     """Test Craftsman model functionality."""
-    
+
     def test_create_craftsman(self, db_session):
         """Test creating a craftsman."""
         craftsman = Craftsman(
-            name="New Craftsman",
-            specialties="electrical",
-            is_active=True
+            name="New Craftsman", specialties="electrical", is_active=True
         )
         db_session.add(craftsman)
         db_session.commit()
-        
+
         assert craftsman.id is not None
         assert craftsman.name == "New Craftsman"
         assert craftsman.specialties == "electrical"
         assert craftsman.is_active is True
         assert craftsman.created_at is not None
-        
+
     def test_craftsman_repr(self, sample_craftsman):
         """Test craftsman string representation."""
         expected = f"<Craftsman(id={sample_craftsman.id}, name='Test Craftsman', specialties='carpentry,plumbing')>"
@@ -166,7 +171,7 @@ class TestCraftsmanModel:
 
 class TestProjectModel:
     """Test Project model functionality."""
-    
+
     def test_create_project(self, db_session, sample_user, sample_client):
         """Test creating a project."""
         project = Project(
@@ -176,11 +181,11 @@ class TestProjectModel:
             budget=Decimal("5000.00"),
             start_date=date(2024, 1, 1),
             user_id=sample_user.id,
-            client_id=sample_client.id
+            client_id=sample_client.id,
         )
         db_session.add(project)
         db_session.commit()
-        
+
         assert project.id is not None
         assert project.name == "Test Project"
         assert project.status == ProjectStatus.PLANNING
@@ -188,19 +193,19 @@ class TestProjectModel:
         assert project.user_id == sample_user.id
         assert project.client_id == sample_client.id
         assert project.created_at is not None
-        
+
     def test_project_relationships(self, db_session, sample_user, sample_client):
         """Test project relationships."""
         project = Project(
             name="Relationship Test",
             status=ProjectStatus.ACTIVE,
             user_id=sample_user.id,
-            client_id=sample_client.id
+            client_id=sample_client.id,
         )
         db_session.add(project)
         db_session.commit()
         db_session.refresh(project)
-        
+
         # Test relationships
         assert project.user == sample_user
         assert project.client == sample_client
@@ -210,27 +215,27 @@ class TestProjectModel:
 
 class TestCampaignModel:
     """Test Campaign model functionality."""
-    
+
     def test_create_campaign(self, db_session, sample_user, sample_client):
         """Test creating a campaign."""
         project = Project(
             name="Test Project",
             status=ProjectStatus.ACTIVE,
             user_id=sample_user.id,
-            client_id=sample_client.id
+            client_id=sample_client.id,
         )
         db_session.add(project)
         db_session.commit()
-        
+
         campaign = Campaign(
             name="Test Campaign",
             description="A test campaign",
             status=CampaignStatus.ACTIVE,
-            project_id=project.id
+            project_id=project.id,
         )
         db_session.add(campaign)
         db_session.commit()
-        
+
         assert campaign.id is not None
         assert campaign.name == "Test Campaign"
         assert campaign.status == CampaignStatus.ACTIVE
@@ -240,37 +245,35 @@ class TestCampaignModel:
 
 class TestItemModel:
     """Test Item model functionality."""
-    
+
     def test_create_item(self, db_session, sample_user, sample_client):
         """Test creating an item."""
         project = Project(
             name="Test Project",
             status=ProjectStatus.ACTIVE,
             user_id=sample_user.id,
-            client_id=sample_client.id
+            client_id=sample_client.id,
         )
         db_session.add(project)
         db_session.commit()
-        
+
         campaign = Campaign(
-            name="Test Campaign",
-            status=CampaignStatus.ACTIVE,
-            project_id=project.id
+            name="Test Campaign", status=CampaignStatus.ACTIVE, project_id=project.id
         )
         db_session.add(campaign)
         db_session.commit()
-        
+
         item = Item(
             name="Test Item",
             description="A test item",
             quantity=10,
             unit=Unit.UNIT,
             estimated_cost=Decimal("100.00"),
-            campaign_id=campaign.id
+            campaign_id=campaign.id,
         )
         db_session.add(item)
         db_session.commit()
-        
+
         assert item.id is not None
         assert item.name == "Test Item"
         assert item.quantity == 10
@@ -281,35 +284,32 @@ class TestItemModel:
 
 class TestQuoteModel:
     """Test Quote model functionality."""
-    
-    def test_create_quote(self, db_session, sample_user, sample_client, sample_craftsman):
+
+    def test_create_quote(
+        self, db_session, sample_user, sample_client, sample_craftsman
+    ):
         """Test creating a quote."""
         project = Project(
             name="Test Project",
             status=ProjectStatus.ACTIVE,
             user_id=sample_user.id,
-            client_id=sample_client.id
+            client_id=sample_client.id,
         )
         db_session.add(project)
         db_session.commit()
-        
+
         campaign = Campaign(
-            name="Test Campaign",
-            status=CampaignStatus.ACTIVE,
-            project_id=project.id
+            name="Test Campaign", status=CampaignStatus.ACTIVE, project_id=project.id
         )
         db_session.add(campaign)
         db_session.commit()
-        
+
         item = Item(
-            name="Test Item",
-            quantity=5,
-            unit=Unit.HOUR,
-            campaign_id=campaign.id
+            name="Test Item", quantity=5, unit=Unit.HOUR, campaign_id=campaign.id
         )
         db_session.add(item)
         db_session.commit()
-        
+
         quote = Quote(
             price=Decimal("150.00"),
             currency=Currency.EUR,
@@ -318,11 +318,11 @@ class TestQuoteModel:
             margin_percentage=Decimal("20.00"),
             valid_until=date(2024, 12, 31),
             item_id=item.id,
-            craftsman_id=sample_craftsman.id
+            craftsman_id=sample_craftsman.id,
         )
         db_session.add(quote)
         db_session.commit()
-        
+
         assert quote.id is not None
         assert quote.price == Decimal("150.00")
         assert quote.currency == Currency.EUR
@@ -334,18 +334,18 @@ class TestQuoteModel:
 
 class TestTaskModel:
     """Test Task model functionality."""
-    
+
     def test_create_task(self, db_session, sample_user, sample_client):
         """Test creating a task."""
         project = Project(
             name="Test Project",
             status=ProjectStatus.ACTIVE,
             user_id=sample_user.id,
-            client_id=sample_client.id
+            client_id=sample_client.id,
         )
         db_session.add(project)
         db_session.commit()
-        
+
         task = Task(
             title="Test Task",
             description="A test task",
@@ -353,11 +353,11 @@ class TestTaskModel:
             priority=TaskPriority.MEDIUM,
             due_date=date(2024, 6, 1),
             project_id=project.id,
-            assigned_user_id=sample_user.id
+            assigned_user_id=sample_user.id,
         )
         db_session.add(task)
         db_session.commit()
-        
+
         assert task.id is not None
         assert task.title == "Test Task"
         assert task.status == TaskStatus.TODO
@@ -368,7 +368,7 @@ class TestTaskModel:
 
 class TestEnums:
     """Test enum values."""
-    
+
     def test_project_status_enum(self):
         """Test ProjectStatus enum values."""
         assert ProjectStatus.PLANNING == "planning"
@@ -376,27 +376,27 @@ class TestEnums:
         assert ProjectStatus.COMPLETED == "completed"
         assert ProjectStatus.CANCELLED == "cancelled"
         assert ProjectStatus.ON_HOLD == "on hold"
-        
+
     def test_campaign_status_enum(self):
         """Test CampaignStatus enum values."""
         assert CampaignStatus.ACTIVE == "active"
         assert CampaignStatus.COMPLETED == "completed"
         assert CampaignStatus.CANCELLED == "cancelled"
         assert CampaignStatus.ON_HOLD == "on hold"
-        
+
     def test_quote_status_enum(self):
         """Test QuoteStatus enum values."""
         assert QuoteStatus.PENDING == "pending"
         assert QuoteStatus.APPROVED == "approved"
         assert QuoteStatus.REJECTED == "rejected"
         assert QuoteStatus.EXPIRED == "expired"
-        
+
     def test_currency_enum(self):
         """Test Currency enum values."""
         assert Currency.EUR == "EUR"
         assert Currency.USD == "USD"
         assert Currency.GBP == "GBP"
-        
+
     def test_unit_enum(self):
         """Test Unit enum values."""
         assert Unit.UNIT == "unit"

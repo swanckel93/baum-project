@@ -1,14 +1,13 @@
-import sys
 import os
+import sys
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config, create_engine
-from sqlalchemy import pool
+from sqlalchemy import create_engine, pool
 
 from alembic import context
 
 # Add the parent directory to the path so we can import from app
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from app.core.config import settings
 from app.models.base import BaseModel
@@ -25,7 +24,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # Import all models to ensure they are registered with SQLAlchemy
-from app.models import *  # noqa: F403, F401
+from app.models import *  # noqa: F403, F401, E402
 
 target_metadata = BaseModel.metadata
 
@@ -69,9 +68,7 @@ def run_migrations_online() -> None:
     connectable = create_engine(settings.DATABASE_URL, poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

@@ -18,9 +18,22 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/studiohub"
-    DATABASE_URL_TEST: str = (
-        "postgresql://postgres:postgres@localhost:5432/studiohub_test"
-    )
+
+    # Test Database Configuration
+    TEST_DB_HOST: str = "localhost"
+    TEST_DB_PORT: int = 5433
+    TEST_DB_USER: str = "test_user"
+    TEST_DB_PASSWORD: str = "test_password"
+    TEST_DB_NAME: str = "test_template"
+
+    @property
+    def test_database_url(self) -> str:
+        """Generate test database URL for template database"""
+        return f"postgresql://{self.TEST_DB_USER}:{self.TEST_DB_PASSWORD}@{self.TEST_DB_HOST}:{self.TEST_DB_PORT}/{self.TEST_DB_NAME}"
+
+    def get_test_db_url(self, db_name: str) -> str:
+        """Generate test database URL for specific test database"""
+        return f"postgresql://{self.TEST_DB_USER}:{self.TEST_DB_PASSWORD}@{self.TEST_DB_HOST}:{self.TEST_DB_PORT}/{db_name}"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379"
@@ -52,6 +65,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"  # Ignore extra environment variables
 
 
 settings = Settings()
