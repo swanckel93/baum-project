@@ -1,21 +1,21 @@
 # Business logic services
 
 from .base import BaseCRUDService
-from .user import user_service, UserService
-from .client import client_service, ClientService
-from .craftsman import craftsman_service, CraftsmanService
-from .project import project_service, ProjectService
-from .campaign import campaign_service, CampaignService
-from .item import item_service, ItemService
-from .quote import quote_service, QuoteService
-from .task import task_service, TaskService
+from .campaign import CampaignService, campaign_service
+from .client import ClientService, client_service
+from .craftsman import CraftsmanService, craftsman_service
+from .item import ItemService, item_service
+from .project import ProjectService, project_service
+from .quote import QuoteService, quote_service
+from .task import TaskService, task_service
+from .user import UserService, user_service
 
 __all__ = [
     # Base service
     "BaseCRUDService",
     # Service classes
     "UserService",
-    "ClientService", 
+    "ClientService",
     "CraftsmanService",
     "ProjectService",
     "CampaignService",
@@ -25,7 +25,7 @@ __all__ = [
     # Service instances
     "user_service",
     "client_service",
-    "craftsman_service", 
+    "craftsman_service",
     "project_service",
     "campaign_service",
     "item_service",

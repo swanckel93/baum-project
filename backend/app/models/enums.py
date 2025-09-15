@@ -1,5 +1,6 @@
 from strenum import StrEnum
 
+
 class ProjectStatus(StrEnum):
     PLANNING = "planning"
     ACTIVE = "active"
@@ -7,11 +8,13 @@ class ProjectStatus(StrEnum):
     CANCELLED = "cancelled"
     ON_HOLD = "on hold"
 
+
 class CampaignStatus(StrEnum):
     ACTIVE = "active"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
     ON_HOLD = "on hold"
+
 
 class QuoteStatus(StrEnum):
     PENDING = "pending"
@@ -19,10 +22,12 @@ class QuoteStatus(StrEnum):
     REJECTED = "rejected"
     EXPIRED = "expired"
 
+
 class Currency(StrEnum):
     EUR = "EUR"
     USD = "USD"
     GBP = "GBP"
+
 
 class TaskStatus(StrEnum):
     TODO = "todo"
@@ -30,11 +35,13 @@ class TaskStatus(StrEnum):
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
+
 class TaskPriority(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     URGENT = "urgent"
+
 
 class Unit(StrEnum):
     UNIT = "unit"

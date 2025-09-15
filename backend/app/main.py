@@ -3,15 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.routers.v1 import (
-    health,
-    users,
+    campaigns,
     clients,
     craftsmen,
-    projects,
-    campaigns,
+    health,
     items,
+    projects,
     quotes,
     tasks,
+    users,
 )
 
 app = FastAPI(

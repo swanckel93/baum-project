@@ -18,19 +18,19 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/studiohub"
-    
+
     # Test Database Configuration
     TEST_DB_HOST: str = "localhost"
     TEST_DB_PORT: int = 5433
     TEST_DB_USER: str = "test_user"
     TEST_DB_PASSWORD: str = "test_password"
     TEST_DB_NAME: str = "test_template"
-    
+
     @property
-    def TEST_DATABASE_URL(self) -> str:
+    def test_database_url(self) -> str:
         """Generate test database URL for template database"""
         return f"postgresql://{self.TEST_DB_USER}:{self.TEST_DB_PASSWORD}@{self.TEST_DB_HOST}:{self.TEST_DB_PORT}/{self.TEST_DB_NAME}"
-    
+
     def get_test_db_url(self, db_name: str) -> str:
         """Generate test database URL for specific test database"""
         return f"postgresql://{self.TEST_DB_USER}:{self.TEST_DB_PASSWORD}@{self.TEST_DB_HOST}:{self.TEST_DB_PORT}/{db_name}"
