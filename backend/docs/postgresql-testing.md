@@ -103,26 +103,39 @@ TEST_DB_NAME: str = "test_template"
 
 ## CI/CD Integration
 
-The system works seamlessly in GitHub Actions:
+The system works seamlessly in GitHub Actions. The repository includes a complete CI workflow at `.github/workflows/ci.yml` that:
 
+- Sets up PostgreSQL service on port 5433
+- Installs Python 3.13 and uv package manager
+- Runs linting with ruff
+- Executes all tests with coverage reporting
+- Uploads coverage results to Codecov
+
+### GitHub Actions Configuration
 ```yaml
-jobs:
-  test:
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
-          POSTGRES_DB: test_template
-        ports:
-          - 5433:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+services:
+  postgres:
+    image: postgres:15-alpine
+    env:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_template
+    ports:
+      - 5433:5432
+    options: >-
+      --health-cmd pg_isready
+      --health-interval 10s
+      --health-timeout 5s
+      --health-retries 5
 ```
+
+The workflow automatically:
+1. Waits for PostgreSQL to be ready
+2. Sets up the Python environment
+3. Installs dependencies with uv
+4. Runs linting checks
+5. Executes all tests with PostgreSQL
+6. Reports coverage metrics
 
 ## Troubleshooting
 
