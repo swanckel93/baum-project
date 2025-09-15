@@ -96,11 +96,12 @@ def sample_craftsman_data():
     """Sample craftsman data for testing"""
     return {
         "name": "Test Craftsman",
-        "specialty": "Carpentry",
+        "specialties": "Carpentry, Woodworking",
         "phone": "+1234567890",
         "email": "craftsman@example.com",
-        "whatsapp_number": "+1234567890",
-        "address": "456 Craft Street, Craft City",
+        "whatsapp": "+1234567890",
+        "hourly_rate": "50.00",
+        "notes": "Experienced craftsman",
         "is_active": True
     }
 
@@ -152,7 +153,7 @@ def sample_quote_data():
         "description": "Test quote description",
         "status": "pending",
         "margin_percentage": "20.00",
-        "valid_until": "2024-12-31",
+        "valid_until": "2025-12-31",
         "item_id": 1,
         "craftsman_id": 1
     }

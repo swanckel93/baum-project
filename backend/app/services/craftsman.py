@@ -12,9 +12,9 @@ class CraftsmanService(BaseCRUDService[Craftsman, CraftsmanCreate, CraftsmanUpda
         """Get craftsman by phone number"""
         return db.query(Craftsman).filter(Craftsman.phone == phone).first()
     
-    def get_by_whatsapp(self, db: Session, *, whatsapp_number: str) -> Optional[Craftsman]:
+    def get_by_whatsapp(self, db: Session, *, whatsapp: str) -> Optional[Craftsman]:
         """Get craftsman by WhatsApp number"""
-        return db.query(Craftsman).filter(Craftsman.whatsapp_number == whatsapp_number).first()
+        return db.query(Craftsman).filter(Craftsman.whatsapp == whatsapp).first()
     
     def get_active(self, db: Session, *, skip: int = 0, limit: int = 100) -> List[Craftsman]:
         """Get active craftsmen only"""
@@ -22,10 +22,10 @@ class CraftsmanService(BaseCRUDService[Craftsman, CraftsmanCreate, CraftsmanUpda
             Craftsman.is_active == True
         ).offset(skip).limit(limit).all()
     
-    def search_by_specialty(self, db: Session, *, specialty: str) -> List[Craftsman]:
-        """Search craftsmen by specialty (case insensitive)"""
+    def search_by_specialties(self, db: Session, *, specialties: str) -> List[Craftsman]:
+        """Search craftsmen by specialties (case insensitive)"""
         return db.query(Craftsman).filter(
-            Craftsman.specialty.ilike(f"%{specialty}%")
+            Craftsman.specialties.ilike(f"%{specialties}%")
         ).all()
 
 

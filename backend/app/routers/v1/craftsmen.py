@@ -77,14 +77,14 @@ def read_craftsmen(
     return craftsmen
 
 
-@router.get("/search/specialty/{specialty}", response_model=List[CraftsmanResponse])
-def search_craftsmen_by_specialty(
+@router.get("/search/specialties/{specialties}", response_model=List[CraftsmanResponse])
+def search_craftsmen_by_specialties(
     *,
     db: Session = Depends(get_db),
-    specialty: str
+    specialties: str
 ) -> List[CraftsmanResponse]:
-    """Search craftsmen by specialty"""
-    craftsmen = craftsman_service.search_by_specialty(db, specialty=specialty)
+    """Search craftsmen by specialties"""
+    craftsmen = craftsman_service.search_by_specialties(db, specialties=specialties)
     return craftsmen
 
 
